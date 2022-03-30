@@ -4,7 +4,6 @@ const client = require('../bdd/bdd');
 const contractOptionsController = {
     
     addContractOption: wrap(async (req, res, next) => {
-        console.log('req body', req.body);
         if (req.user.role !== 'admin') {
             const error = new Error('Unauthorized. You have no rights in order to add a contract option');
             error.status = 403;

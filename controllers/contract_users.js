@@ -93,7 +93,6 @@ const contractUsersController = {
         }
     
         const dateEnd = (contractBody.date_end) ? contractBody.date_end : null;
-        console.log('dateEnd', dateEnd)
         const dateResiliation = (contractBody.date_resiliation) ? contractBody.date_resiliation : null;
         const updateContractUser = `UPDATE contract_users
                             SET id_contract = ${contractBody.id_contract},

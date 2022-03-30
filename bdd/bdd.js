@@ -1,6 +1,5 @@
 const { Client } = require('pg')
 
-console.log('in client');
 // const client = new Client({
 //     user: 'postgres',
 //     host: 'localhost',
