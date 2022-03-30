@@ -29,7 +29,6 @@ app.use('*', wrap(async (req, res, next) => {
         return next(error);
     }
     req.user = currentUser.rows[0];
-    console.log('req user', req.user);
     return next();
 }))
 

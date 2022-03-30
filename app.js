@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const auth = require('./middlewares/auth');
 const cors = require('cors');
 const client = require('./bdd/bdd');
+const updateStatusContract = require('./lib/daily_update_status_contract');
 
 
 const api = require('./routes/api');
@@ -34,14 +35,11 @@ app.use(cors({origin: true, credentials: true}))
 app.use(auth)
 
 // Use router middleware
-
 app.use('/', api);
 
+// Use custom Lib
+updateStatusContract.updateStatusContract();
 
-
-
-// app.use('/', indexRouter);
-// app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

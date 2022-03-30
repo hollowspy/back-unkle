@@ -6,7 +6,6 @@ const usersController = {
     
     listUsers: wrap(async (req, res, next) => {
         const users = await client.query('SELECT * FROM users');
-        console.log('type users', typeof users.rows)
         return res.send({
            users: users.rows
         })
@@ -14,7 +13,11 @@ const usersController = {
     
     
     createUser: wrap(async (req, res, next) => {
-        console.log('AAAAAAA')
+        if (req.user.role !== 'admin') {
+            const error = new Error('Unauthorized. You have no rights in order to add a a new user');
+            error.status = 403;
+            return next(error);
+        }
         const user = {...req.body};
         const passwordHash = bcrypt.hashSync(user.password, 10);
         const query = `INSERT INTO USERS (email, password , role) VALUES ('${user.email}', '${passwordHash}', '${user.role}')`;
@@ -52,17 +55,19 @@ const usersController = {
             error.status = 400;
             return next(error)
         }
-        console.log('req user', req.user);
         if (req.user.role !== 'admin') {
             const error = new Error('Unauthorized. You have no right to delete some users');
             error.status = 403;
             return next(error)
         }
         const idUserRequested = parseInt(req.params.id, 10);
+        if (req.user.id === idUserRequested) {
+            const error = new Error('You can not delete your own user');
+            error.status = 400;
+            return next(error);
+        }
         const query = `DELETE FROM users WHERE id = ${idUserRequested}`
-        console.log('query', query);
         const deleteUser = await client.query(query);
-        console.log('deleteUser', deleteUser);
         return res.send({
             success: (deleteUser.rowCount > 0)
         })
