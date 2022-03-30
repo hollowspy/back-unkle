@@ -109,7 +109,7 @@ const contractUsersController = {
             error.status = 400;
             return next(error);
         }
-        return res.send(updateContractUser.rows[0])
+        return res.send(contractDelete.rows[0])
        
     })
 };
