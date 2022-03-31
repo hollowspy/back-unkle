@@ -36,7 +36,7 @@ const contractUsersController = {
         if (req.query.full && req.query.full === 'true') {
             const fullContractUsers = await Promise.all(contractUsers.rows.map(async (c) => {
                 const contracts = await client.query(`SELECT * FROM contracts WHERE id = ${c.id_contract}`)
-                const options = await client.query(`SELECT * FROM contract_options WHERE id_contract = ${c.id}`);
+                const options = await client.query(`SELECT * FROM contract_options WHERE id_contract_user = ${c.id}`);
                 const fullOptions = await Promise.all(options.rows.map(async (o) => {
                     const option = await client.query(`SELECT * FROM options WHERE id = ${o.id_option}`);
                     return {
@@ -91,16 +91,28 @@ const contractUsersController = {
             error.status = 403;
             return next(error)
         }
+        
     
         const dateEnd = (contractBody.date_end) ? contractBody.date_end : null;
         const dateResiliation = (contractBody.date_resiliation) ? contractBody.date_resiliation : null;
+        
+        if (dateResiliation) {
+            const mToday = moment(new Date()).format('L');
+            const mDateResiliation = moment(new Date(dateResiliation)).format('L');
+            if (moment(mDateResiliation).isBefore(mToday)) {
+                const error = new Error('Date resililation must be higher than today');
+                error.status = 400;
+                return next(error);
+            }
+        }
+        
         const updateContractUser = `UPDATE contract_users
                             SET id_contract = ${contractBody.id_contract},
                             id_user = ${contractBody.id_user},
                             status = '${contractBody.status}',
                             date_start = '${moment(new Date(contractBody.date_start)).format('YYYY-MM-DD')}',
-                            date_end = '${(dateEnd) ? `${moment(new Date(dateEnd)).format('YYYY-MM-DD')}`: null}',
-                            date_resiliation = '${(dateResiliation) ? `${moment(new Date(dateResiliation)).format('YYYY-MM-DD')}`: null}'
+                            date_end = ${(dateEnd) ? `'${moment(new Date(dateEnd)).format('YYYY-MM-DD')}'`: null},
+                            date_resiliation = ${(dateResiliation) ? `'${moment(new Date(dateResiliation)).format('YYYY-MM-DD')}'`: null}
                             WHERE id = ${parseInt(req.params.id, 10)}
                             RETURNING contract_users.*;`
         const contractDelete = await client.query(updateContractUser);

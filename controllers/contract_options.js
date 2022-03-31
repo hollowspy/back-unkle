@@ -9,7 +9,7 @@ const contractOptionsController = {
             error.status = 403;
             return next(error);
         }
-        const query = `INSERT INTO contract_options (id_contract, id_option)
+        const query = `INSERT INTO contract_options (id_contract_user, id_option)
         VALUES (${req.body.id_contract}, ${req.body.id_option})
         RETURNING contract_options.*;`
         const newContractOption = await client.query(query)
